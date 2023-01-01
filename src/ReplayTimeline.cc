@@ -1741,7 +1741,7 @@ std::shared_ptr<ReplayTimeline::Mark> ReplayTimeline::find_closest_mark_with_clo
 
   for(auto it = std::rbegin(marks_found->second); it != std::rend(marks_found->second); it++) {
     DEBUG_ASSERT(it->get() != nullptr);
-    if((*it)->checkpoint && (*it)->checkpoint->partially_initialized()) {
+    if((*it)->checkpoint) {
       std::shared_ptr<Mark> result = std::make_shared<Mark>();
       result->ptr = *it;
       return result;

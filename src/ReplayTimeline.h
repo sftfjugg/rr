@@ -3,7 +3,7 @@
 #ifndef RR_REPLAY_TIMELINE_H_
 #define RR_REPLAY_TIMELINE_H_
 
-#include <cstdint>
+#include <stdint.h>
 #include <iostream>
 #include <map>
 #include <memory>
