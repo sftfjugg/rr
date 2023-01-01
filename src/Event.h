@@ -388,8 +388,10 @@ struct Event {
   /** Return a string naming |ev|'s type. */
   std::string type_name() const;
 
-  // XXX make all places use this instead of the static function in ReplaySession.cc
-  /** Check if this event is checkpointable */
+  /**
+   * Return true if it's possible/meaningful to make a checkpoint at the
+   * |frame| that |t| will replay.
+   */
   bool can_checkpoint_at() const;
 
   static Event noop() { return Event(EV_NOOP); }

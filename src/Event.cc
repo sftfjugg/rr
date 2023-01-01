@@ -249,8 +249,14 @@ bool Event::can_checkpoint_at() const {
   }
   switch (type()) {
     case EV_EXIT:
+    // At exits, we can't clone the exiting tasks, so
+    // don't event bother trying to checkpoint.
     case EV_SYSCALLBUF_RESET:
+    // RESETs are usually inserted in between syscall
+    // entry/exit.  Do not attempting to checkpoint at
+    // RESETs.  Users would never want to do that anyway.
     case EV_TRACE_TERMINATION:
+      // There's nothing to checkpoint at the end of a trace.
       return false;
     default:
       return true;

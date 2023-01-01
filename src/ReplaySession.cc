@@ -264,35 +264,11 @@ ReplaySession::shr_ptr ReplaySession::clone() {
   return session;
 }
 
-/**
- * Return true if it's possible/meaningful to make a checkpoint at the
- * |frame| that |t| will replay.
- */
-static bool can_checkpoint_at(const Event& ev) {
-  if (ev.has_ticks_slop()) {
-    return false;
-  }
-  switch (ev.type()) {
-    case EV_EXIT:
-    // At exits, we can't clone the exiting tasks, so
-    // don't event bother trying to checkpoint.
-    case EV_SYSCALLBUF_RESET:
-    // RESETs are usually inserted in between syscall
-    // entry/exit.  Do not attempting to checkpoint at
-    // RESETs.  Users would never want to do that anyway.
-    case EV_TRACE_TERMINATION:
-      // There's nothing to checkpoint at the end of a trace.
-      return false;
-    default:
-      return true;
-  }
-}
-
 bool ReplaySession::can_clone() {
   finish_initializing();
 
   ReplayTask* t = current_task();
-  return t && done_initial_exec() && can_checkpoint_at(current_trace_frame().event());
+  return t && done_initial_exec() && current_trace_frame().event().can_checkpoint_at();
 }
 
 DiversionSession::shr_ptr ReplaySession::clone_diversion() {
