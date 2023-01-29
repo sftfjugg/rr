@@ -59,7 +59,7 @@ RerunCommand RerunCommand::singleton(
     "  -r, --raw                  dump registers in raw format\n"
     "  -s, --trace-start=<EVENT>  start tracing at <EVENT>. If a persistent checkpoint exists\n"
     "                             before <EVENT> the session will spawn from that point.\n"
-    "  -i  --ignore-pcp           Ignore persistent checkpoints when running command.\n"
+    "  --ignore-pcp               Ignore persistent checkpoints when running command.\n"
     "  -u, --cpu-unbound          allow replay to run on any CPU. Default is\n"
     "                             to run on the CPU stored in the trace.\n"
     "                             Note that this may diverge from the recording\n"
@@ -497,12 +497,12 @@ static bool parse_rerun_arg(vector<string>& args, RerunFlags& flags) {
     { 2, "event-regs", HAS_PARAMETER },
     { 3, "export-checkpoints", HAS_PARAMETER },
     { 4, "import-checkpoint", HAS_PARAMETER },
+    { 5, "ignore-pcp", NO_PARAMETER },
     { 'e', "trace-end", HAS_PARAMETER },
     { 'f', "function", HAS_PARAMETER },
     { 'r', "raw", NO_PARAMETER },
     { 's', "trace-start", HAS_PARAMETER },
     { 'u', "cpu-unbound", NO_PARAMETER },
-    { 'i', "ignore-pcp", NO_PARAMETER }
   };
   ParsedOption opt;
   if (!Command::parse_option(args, options, &opt)) {
@@ -527,6 +527,9 @@ static bool parse_rerun_arg(vector<string>& args, RerunFlags& flags) {
       break;
     case 4:
       flags.import_checkpoint_socket = opt.value;
+      break;
+    case 5:
+      flags.ignore_pcp = true;
       break;
     case 'e':
       if (!opt.verify_valid_int(1, UINT32_MAX)) {
@@ -554,9 +557,6 @@ static bool parse_rerun_arg(vector<string>& args, RerunFlags& flags) {
       break;
     case 'u':
       flags.cpu_unbound = true;
-      break;
-    case 'i':
-      flags.ignore_pcp = true;
       break;
     break;
     default:
