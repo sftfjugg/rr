@@ -19,8 +19,6 @@
 
 namespace rr {
 
-char* extract_name(char* name_buffer, size_t buffer_size);
-
 class AddressSpace;
 class DiversionSession;
 class EmuFs;

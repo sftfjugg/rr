@@ -508,38 +508,6 @@ KernelMapping Session::create_shared_mmap(
   return km;
 }
 
-char* extract_name(char* name_buffer, size_t buffer_size) {
-  // Recover the name that was originally chosen by finding the part of the
-  // name between rr_mapping_prefix and the -%d-%d at the end.
-  char* path_start = strstr(name_buffer, Session::rr_mapping_prefix());
-  DEBUG_ASSERT(path_start &&
-               "Passed something to create_shared_mmap that"
-               " wasn't a mapping shared between rr and the tracee?");
-  size_t prefix_len = path_start - name_buffer;
-  buffer_size -= prefix_len;
-  name_buffer += prefix_len;
-
-  char* name_end = name_buffer + strnlen(name_buffer, buffer_size);
-  char* name_start = name_buffer + strlen(Session::rr_mapping_prefix());
-  int hyphens_seen = 0;
-  while (name_end > name_start) {
-    --name_end;
-    if (*name_end == '-') {
-      ++hyphens_seen;
-    } else if (*name_end == '/') {
-      DEBUG_ASSERT(false &&
-                   "Passed something to create_shared_mmap that"
-                   " wasn't a mapping shared between rr and the tracee?");
-    }
-    if (hyphens_seen == 2) {
-      break;
-    }
-  }
-  DEBUG_ASSERT(hyphens_seen == 2);
-  *name_end = '\0';
-  return name_start;
-}
-
 const AddressSpace::Mapping Session::recreate_shared_mmap(
     AutoRemoteSyscalls& remote, const AddressSpace::Mapping& m,
     PreserveContents preserve, MonitoredSharedMemory::shr_ptr monitored) {
