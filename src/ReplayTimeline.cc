@@ -225,13 +225,7 @@ ReplayTimeline::Mark ReplayTimeline::mark() {
 ReplayTimeline::Mark ReplayTimeline::recreate_mark_from_data(const MarkData& mark_data, ReplaySession::shr_ptr session) {
   Mark result;
   auto m = make_shared<InternalMark>(this, mark_data, session);
-  if (marks.empty()) {
-    marks = {};
-  }
 
-  if (marks.count(m->proto.key) == 0) {
-    marks[m->proto.key] = {};
-  }
   auto& mark_vector = marks[m->proto.key];
   mark_vector.push_back(m);
   result.ptr = mark_vector.back();
