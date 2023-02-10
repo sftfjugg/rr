@@ -9,6 +9,7 @@
 
 #include "FileMonitor.h"
 #include "HasTaskSet.h"
+#include "rr_pcp.capnp.h"
 
 namespace rr {
 
@@ -69,10 +70,13 @@ public:
    * Close fds in list after an exec.
    */
   void close_after_exec(ReplayTask* t, const std::vector<int>& fds_to_close);
-  const std::unordered_map<int, FileMonitor::shr_ptr>& monitored_fds() const { return fds; }
+
   // Used to optimize ReplayTask's find_free_file_descriptor
   int last_free_fd() const { return last_free_fd_; }
   void set_last_free_fd(int last_free_fd) { last_free_fd_ = last_free_fd; }
+
+  void serialize(pcp::ProcessSpace::Builder& leader_builder) const;
+  void deserialize(Task* leader, const pcp::ProcessSpace::Reader& leader_reader);
 
   void insert_task(Task* t) override;
   void erase_task(Task* t) override;

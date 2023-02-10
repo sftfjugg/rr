@@ -17,7 +17,7 @@ public:
   ProcMemMonitor(Task* t, const std::string& pathname);
   ProcMemMonitor(AddressSpaceUid auid) noexcept;
 
-  virtual Type type() override { return ProcMem; }
+  virtual Type type() const override { return ProcMem; }
 
   // We need to PREVENT_SWITCH, since the timing of the write is otherwise
   // unpredictable from our perspective.
@@ -31,9 +31,9 @@ public:
   }
 
   bool target_is_vm(AddressSpace *t);
-  AddressSpaceUid get_auid() const { return auid; }
 
 private:
+  void serialize_type(pcp::FileMonitor::Builder& builder) const noexcept override;
   // 0 if this doesn't object doesn't refer to a tracee's proc-mem.
   AddressSpaceUid auid;
 };

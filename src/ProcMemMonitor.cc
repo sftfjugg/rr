@@ -71,4 +71,11 @@ bool ProcMemMonitor::target_is_vm(AddressSpace *vm) {
   return auid == vm->uid();
 }
 
+void ProcMemMonitor::serialize_type(pcp::FileMonitor::Builder& builder) const noexcept {
+  auto pm = builder.initProcMem();
+  pm.setExecCount(auid.exec_count());
+  pm.setTid(auid.tid());
+  pm.setSerial(auid.serial());
+}
+
 } // namespace rr

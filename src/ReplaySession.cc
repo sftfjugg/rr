@@ -2173,19 +2173,7 @@ void ReplaySession::serialize_checkpoint(CheckpointInfo& cp_info) {
       auto ms = member_states[cs_idx++];
       write_capture_state(ms, state);
     }
-
-    auto serialized_fd_mons = pspace.initMonitors(
-        as.clone_leader->fd_table()->monitored_fds().size());
-    auto mon_index = 0;
-    for (const auto& fd_monitor_pair :
-         clone_completion
-             ->cloned_fd_tables[as.clone_leader_state.fdtable_identity]
-             ->monitored_fds()) {
-      auto builder = serialized_fd_mons[mon_index++];
-      const auto fd = fd_monitor_pair.first;
-      const auto monitor = fd_monitor_pair.second;
-      write_monitor(builder, fd, monitor.get());
-    }
+    clone_completion->cloned_fd_tables[as.clone_leader_state.fdtable_identity]->serialize(pspace);
     cc.setUsesSyscallBuffering(leader->vm()->syscallbuf_enabled());
   }
 

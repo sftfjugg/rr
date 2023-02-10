@@ -126,4 +126,10 @@ void ProcFdDirMonitor::filter_getdents(RecordTask* t) {
   filter_dirents(t);
 }
 
+void ProcFdDirMonitor::serialize_type(pcp::FileMonitor::Builder &builder) const noexcept {
+  auto pfd = builder.initProcFd();
+  pfd.setTid(tuid.tid());
+  pfd.setSerial(tuid.serial());
+}
+
 } // namespace rr

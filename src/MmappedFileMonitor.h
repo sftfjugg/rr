@@ -20,7 +20,7 @@ public:
   MmappedFileMonitor(Task* t, EmuFile::shr_ptr f);
   MmappedFileMonitor(bool dead, dev_t device, ino_t inode) noexcept;
 
-  virtual Type type() override { return Mmapped; }
+  virtual Type type() const override { return Mmapped; }
   void revive() { dead_ = false; }
   // If this write could potentially affect memory we need to PREVENT_SWITCH,
   // since the timing of the write is otherwise unpredictable from our
@@ -34,8 +34,9 @@ public:
    */
   virtual void did_write(Task* t, const std::vector<Range>& ranges,
                          LazyOffset& offset) override;
-  std::tuple<bool, dev_t, ino_t> info() const { return std::tuple<bool, dev_t, ino_t>{dead_, device_, inode_}; }
+
 private:
+  void serialize_type(pcp::FileMonitor::Builder& builder) const noexcept override;
   // Whether this monitor is still actively monitoring
   bool dead_;
   dev_t device_;

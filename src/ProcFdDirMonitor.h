@@ -17,12 +17,12 @@ public:
   ProcFdDirMonitor(Task* t, const std::string& pathname);
   ProcFdDirMonitor(TaskUid tuid) noexcept;
 
-  virtual Type type() override { return ProcFd; }
+  virtual Type type() const override { return ProcFd; }
 
   virtual void filter_getdents(RecordTask* t) override;
-  TaskUid task_uuid() const { return tuid; }
 
 private:
+  void serialize_type(pcp::FileMonitor::Builder& builder) const noexcept override;
   // 0 if this doesn't object doesn't refer to a tracee's proc-mem.
   TaskUid tuid;
 };

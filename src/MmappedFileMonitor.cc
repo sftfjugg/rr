@@ -110,4 +110,11 @@ void MmappedFileMonitor::did_write(Task* t, const std::vector<Range>& ranges,
   }
 }
 
+void MmappedFileMonitor::serialize_type(pcp::FileMonitor::Builder& builder) const noexcept {
+  auto mmap = builder.initMmap();
+  mmap.setDead(dead_);
+  mmap.setDevice(device_);
+  mmap.setInode(inode_);
+}
+
 } // namespace rr

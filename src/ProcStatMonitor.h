@@ -18,12 +18,13 @@ class ProcStatMonitor : public FileMonitor {
 public:
   ProcStatMonitor(Task* t, const std::string& pathname);
 
-  virtual Type type() override { return ProcStat; }
+  virtual Type type() const override { return ProcStat; }
 
   bool emulate_read(RecordTask* t, const std::vector<Range>& ranges,
                     LazyOffset&, uint64_t* result) override;
-  const std::string& get_data() const { return data; }
+
 private:
+  void serialize_type(pcp::FileMonitor::Builder& builder) const noexcept override;
   std::string data;
 };
 

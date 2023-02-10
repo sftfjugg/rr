@@ -78,49 +78,6 @@ std::string checkpoints_index_file(const std::string& trace_dir) {
   return trace_dir + "/checkpoints";
 }
 
-void write_monitor(rr::pcp::FileMonitor::Builder& builder, int fd,
-                   FileMonitor* monitor) {
-  builder.setFd(fd);
-  builder.setType(monitor->type());
-  switch (monitor->type()) {
-    case FileMonitor::Mmapped: {
-      auto contents = ((MmappedFileMonitor*)monitor)->info();
-      auto mmap = builder.initMmap();
-      mmap.setDead(std::get<0>(contents));
-      mmap.setDevice(std::get<1>(contents));
-      mmap.setInode(std::get<2>(contents));
-    } break;
-    case FileMonitor::ProcFd: {
-      auto pfd = builder.initProcFd();
-      const auto tuid = ((ProcFdDirMonitor*)monitor)->task_uuid();
-      pfd.setTid(tuid.tid());
-      pfd.setSerial(tuid.serial());
-    } break;
-    case FileMonitor::ProcMem: {
-      auto pm = builder.initProcMem();
-      const auto auid = ((ProcMemMonitor*)monitor)->get_auid();
-      pm.setExecCount(auid.exec_count());
-      pm.setTid(auid.tid());
-      pm.setSerial(auid.serial());
-    } break;
-    case FileMonitor::Stdio:
-      builder.setStdio(((StdioMonitor*)monitor)->fd());
-      break;
-    case FileMonitor::ProcStat:
-      builder.setProcStat(str_to_data(((ProcStatMonitor*)monitor)->get_data()));
-      break;
-    case FileMonitor::BpfMap: {
-      auto bpf = builder.initBpf();
-      bpf.setKeySize(((BpfMapMonitor*)monitor)->key_size());
-      bpf.setValueSize(((BpfMapMonitor*)monitor)->key_size());
-    } break;
-    case FileMonitor::VirtualPerfCounter:
-      FATAL() << "FileMonitor::VirtualPerfCounter not implemented";
-      break;
-    default:
-      break;
-  }
-}
 
 static void write_map(const WriteVmConfig& cfg,
                       rr::pcp::KernelMapping::Builder builder,
