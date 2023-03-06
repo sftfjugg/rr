@@ -181,8 +181,6 @@ static void write_map(const WriteVmConfig& cfg,
       const auto isSysVSegment =
           cfg.clone_leader->vm()->has_shm_at(map.map) ||
           cfg.clone_leader->vm()->has_shm_at(map.recorded_map);
-      shared_anon.setSkipMonitoringMappedFd(map.monitored_shared_memory ==
-                                            nullptr);
       shared_anon.setContentsPath(contents_path);
       shared_anon.setIsSysVSegment(isSysVSegment);
     } else {

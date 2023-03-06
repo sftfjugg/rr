@@ -59,24 +59,22 @@ struct KernelMapping {
   offset @7 :UInt64;
   mapType :union {
     file :group { # mapping of a file
-      skipMonitoringMappedFd @8 :Bool; # unsure if needed, or how it's used
-      contentsPath @9 :Path;
+      contentsPath @8 :Path;
     }
-    guardSegment @10 :Void; # Empty map segment, PROT NONE, no pages in physical memory, no fsname
+    guardSegment @9 :Void; # Empty map segment, PROT NONE, no pages in physical memory, no fsname
     # Mapping types below can all be compressed, as they need to be copied into the mapping anyhow
     sharedAnon :group {
-      skipMonitoringMappedFd @11 :Bool; # unsure if needed, or how it's used
-      contentsPath @12 :Path;
-      isSysVSegment @13 :Bool; # if we're a SysV, we need to set AddressSpace::shm_sizes[start] = size;
+      contentsPath @10 :Path;
+      isSysVSegment @11 :Bool; # if we're a SysV, we need to set AddressSpace::shm_sizes[start] = size;
     }
     privateAnon :group { # e.g. stack, heap, etc
-      contentsPath @14 :Path;
+      contentsPath @12 :Path;
     }
     syscallBuffer :group {
-      contentsPath @15 :Path;
+      contentsPath @13 :Path;
     }
     rrPage :group {
-      contentsPath @16 :Path;
+      contentsPath @14 :Path;
     }
   }
 }
