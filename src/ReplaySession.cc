@@ -2209,11 +2209,11 @@ void ReplaySession::load_checkpoint(
     Task* child = Task::os_clone(Task::SESSION_CLONE_LEADER, this, remote,
                                  taskInfo.getRecTid(), taskInfo.getSerial(),
                                  SIGCHLD, nullptr);
-    cloned_leaders.push_back((ReplayTask*)child);
+    cloned_leaders.push_back(static_cast<ReplayTask*>(child));
   }
 
   auto clone_leader_index = 0;
-
+  LOG(debug) << "Restoring " << addr_spaces.size() << " clone leaders";
   for (const auto& as : addr_spaces) {
     ReplayTask* leader = cloned_leaders[clone_leader_index++];
     const auto proc_space = as.getProcessSpace();
@@ -2324,9 +2324,7 @@ void ReplaySession::load_checkpoint(
       auto index = original_exe_name.rfind('/');
       auto name = "rr:" + original_exe_name.substr(
                               index == std::string::npos ? 0 : index + 1);
-      AutoRestoreMem mem(remote, name.c_str());
-      remote.infallible_syscall(syscall_number_for_prctl(leader->arch()),
-                                PR_SET_NAME, mem.get());
+      leader->set_name(remote, name);
     }
 
     ASSERT(leader, scratch_mem != nullptr)

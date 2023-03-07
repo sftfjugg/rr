@@ -460,6 +460,10 @@ public:
    */
   virtual std::string name() const;
 
+  /**
+   * Sets the OS-name of this task by injecting system call for PR_SET_NAME.
+   * Also updates |prname| to |name|.
+   */
   virtual void set_name(AutoRemoteSyscalls& remote, const std::string& name);
 
   /**
