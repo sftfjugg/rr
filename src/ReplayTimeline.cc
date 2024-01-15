@@ -225,7 +225,7 @@ ReplayTimeline::Mark ReplayTimeline::mark() {
 ReplayTimeline::Mark ReplayTimeline::recreate_mark_from_data(const MarkData& mark_data, ReplaySession::shr_ptr session) {
   Mark result;
   auto m = make_shared<InternalMark>(this, mark_data, session);
-
+  m->inc_refcount();
   auto& mark_vector = marks[m->proto.key];
   mark_vector.push_back(m);
   result.ptr = mark_vector.back();
@@ -235,11 +235,7 @@ ReplayTimeline::Mark ReplayTimeline::recreate_mark_from_data(const MarkData& mar
 void ReplayTimeline::register_mark_as_checkpoint(Mark& m) {
   DEBUG_ASSERT(m.ptr && m.ptr->checkpoint && "Can't register mark as checkpoint if no checkpoint exists");
   auto key = m.ptr->proto.key;
-  if (marks_with_checkpoints.find(key) == marks_with_checkpoints.end()) {
-    marks_with_checkpoints[key] = 1;
-  } else {
-    marks_with_checkpoints[key]++;
-  }
+  increase_mark_with_checkpoints(key);
   m.ptr->inc_refcount();
 }
 
@@ -313,6 +309,15 @@ ReplayTimeline::Mark ReplayTimeline::lazy_reverse_singlestep(const Mark& from,
   return Mark();
 }
 
+void ReplayTimeline::increase_mark_with_checkpoints(
+    const MarkKey& key) noexcept {
+  if (marks_with_checkpoints.find(key) == marks_with_checkpoints.end()) {
+    marks_with_checkpoints[key] = 1;
+  } else {
+    marks_with_checkpoints[key]++;
+  }
+}
+
 ReplayTimeline::Mark ReplayTimeline::add_explicit_checkpoint() {
   DEBUG_ASSERT(current->can_clone());
 
@@ -321,11 +326,7 @@ ReplayTimeline::Mark ReplayTimeline::add_explicit_checkpoint() {
     unapply_breakpoints_and_watchpoints();
     m.ptr->checkpoint = current->clone();
     auto key = m.ptr->proto.key;
-    if (marks_with_checkpoints.find(key) == marks_with_checkpoints.end()) {
-      marks_with_checkpoints[key] = 1;
-    } else {
-      marks_with_checkpoints[key]++;
-    }
+    increase_mark_with_checkpoints(key);
   }
   m.ptr->inc_refcount();
   return m;
@@ -798,11 +799,9 @@ ReplayTimeline::Mark ReplayTimeline::recreate_marks_for_non_explicit(const Check
   // first add the mark with an actual clone, this is not a GDB checkpoint, but an RR checkpoint
   auto mark = recreate_mark_from_data(cp.clone_data, clone);
   reverse_exec_checkpoints[mark] = estimate_progress_of(*clone);
-  mark.get_internal()->inc_refcount();
   register_mark_as_checkpoint(mark);
   // then add the mark with no clone, the one that will be visible to GDB, i.e. non explicit checkpoint
   Mark result = recreate_mark_from_data(*cp.non_explicit_mark_data, nullptr);
-  // auto internal = make_shared<InternalMark>(this, *cp.non_explicit_data, nullptr);
   return result;
 }
 
@@ -1736,8 +1735,8 @@ std::shared_ptr<ReplayTimeline::Mark> ReplayTimeline::find_closest_mark_with_clo
   for(auto it = std::rbegin(marks_found->second); it != std::rend(marks_found->second); it++) {
     DEBUG_ASSERT(it->get() != nullptr);
     if((*it)->checkpoint) {
-      std::shared_ptr<Mark> result = std::make_shared<Mark>();
-      result->ptr = *it;
+      auto result = std::make_shared<Mark>();
+      result->ptr = *(it);
       return result;
     }
   }

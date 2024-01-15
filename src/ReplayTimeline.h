@@ -147,6 +147,9 @@ public:
    */
   void remove_explicit_checkpoint(const Mark& mark);
 
+  /** Find mark that has `key` and increase the checkpoint count for that mark. */
+  void increase_mark_with_checkpoints(const MarkKey& key) noexcept;
+
   /**
    * Return true if we're currently at the given mark.
    */

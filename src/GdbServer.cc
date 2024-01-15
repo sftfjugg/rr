@@ -2250,6 +2250,10 @@ Checkpoint::Checkpoint(ReplayTimeline& timeline, TaskUid last_continue_tuid,
     mark = timeline.add_explicit_checkpoint();
   } else {
     mark = timeline.mark();
+    const auto prior = timeline.find_closest_mark_with_clone(mark);
+    if(prior) {
+      prior->get_internal()->inc_refcount();
+    }
   }
 }
 
