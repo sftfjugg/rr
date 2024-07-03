@@ -77,9 +77,6 @@ static const uint64_t PKRU_FEATURE_MASK = 1 << PKRU_FEATURE_BIT;
 static const size_t xsave_header_offset = 512;
 static const size_t xsave_header_size = 64;
 static const size_t xsave_header_end = xsave_header_offset + xsave_header_size;
-// This is always at 576 since AVX is always the first optional feature,
-// if present.
-static const size_t AVX_xsave_offset = 576;
 struct RegisterConfig {
   int8_t feature;
   GdbServerRegister base;

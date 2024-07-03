@@ -93,7 +93,7 @@ if (SUPPORTS_MACRO_PREFIX_MAP)
   set(FLAGS_COMMON "${FLAGS_COMMON} -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=")
 endif()
 
-try_compile(AVX512F_SUPPORT ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/test/gdb_avx512.c CMAKE_FLAGS -DCOMPILE_DEFINITIONS=-mavx512f)
+try_compile(AVX512F_SUPPORT ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/test/gdb_avx512.c CMAKE_FLAGS -DCOMPILE_DEFINITIONS=-march=native)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAGS_COMMON} -Wstrict-prototypes -std=gnu11")
 # Define __STDC_LIMIT_MACROS so |#include <stdint.h>| works as expected.
